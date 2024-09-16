@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library</title>
+  </head>
+  <body>
+    <main>
+      <ul></ul>
+      <button id="add-book">New Book</button>
+      <dialog closed>
+        <form action="#" method="dialog">
+          <label for="title">Title:</label>
+          <input id="title" type="text" />
+          <label for="author">Author:</label>
+          <input id="author" type="text" />
+          <label for="page">Page Number:</label>
+          <input id="page" type="text" />
+          <label for="read">Read:</label>
+          <input id="read" type="text" />
+          <button value="cancel" formmethod="dialog">Cancel</button>
+          <button id="confirmBtn" value="default">Confirm</button>
+        </form>
+      </dialog>
+    </main>
+    <script>
+      // array that will contain the book objects
+      const myLibrary = [];
+      const list = document.querySelector("ul");
+      const button = document.querySelector("#add-book");
+      const confirmBtn = document.querySelector("#confirmBtn");
+      const dialog = document.querySelector("dialog");
+
+      // button that shows dialog form
+      button.addEventListener("click", () => {
+        dialog.showModal();
+      });
+
+      // returns object to be added to the array
+      function Books(title, author, pages, readStatus) {
+        this.author = author;
+        this.title = title;
+        this.pages = pages;
+        this.readStatus = readStatus;
+        this.info = function () {
+          const { title, author, pages, readStatus } = this;
+          return `${title} by ${author}, ${pages} pages, ${readStatus} yet!`;
+        };
+      }
+
+      styles();
+
+      // function that asks for book name
+      confirmBtn.addEventListener("click", () => {
+        // inputs inside the dialog
+        let title = document.getElementById("title").value;
+        let author = document.getElementById("author").value;
+        let page = document.getElementById("page").value;
+        let read = document.getElementById("read").value;
+
+        // if any of the inputs are empty, give warning
+        if (!title || !author || !page || !read) {
+          alert("Please fill in all fields");
+          return;
+        }
+
+        // Create a new Book object with the extracted values
+        const newBook = new Books(title, author, page, read);
+
+        // Add the new book to the library
+        myLibrary.push(newBook);
+
+        // Close the dialog
+        dialog.close();
+
+        // Clear the dialog inputs
+        emptyInputs();
+
+        // Update the book list
+        list.innerHTML = ""; // Clear the list
+        myLibrary.forEach((book) => {
+          const bookListItem = document.createElement("li");
+          bookListItem.textContent = book.info();
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "x";
+          deleteBtn.classList.add("delete-button");
+          bookListItem.appendChild(deleteBtn);
+          list.appendChild(bookListItem);
+
+          // Add event listener to the delete button
+          deleteBtn.addEventListener("click", () => {
+            bookListItem.remove();
+            myLibrary.pop(newBook);
+          });
+
+          // Add event listener to cancel button
+          document
+            .querySelector('button[value="cancel"]')
+            .addEventListener("click", emptyInputs);
+        });
+
+        styles();
+      });
+
+      // function that empties the dialog inputs
+      function emptyInputs() {
+        title.value = "";
+        author.value = "";
+        page.value = "";
+        read.value = "";
+      }
+
+      // function to add styles
+      function styles() {
+        document.body.style.fontFamily = "Arial, sans-serif";
+        document.querySelectorAll("button").forEach((e) => {
+          e.style.margin = "0 10px";
+        });
+        document.querySelectorAll("input").forEach((e) => {
+          e.style.display = "block";
+          e.style.margin = "10px 0";
+        });
+      }
+    </script>
+  </body>
+</html>
