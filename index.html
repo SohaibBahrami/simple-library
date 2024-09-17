@@ -16,9 +16,9 @@
           <label for="author">Author:</label>
           <input id="author" type="text" />
           <label for="page">Page Number:</label>
-          <input id="page" type="text" />
+          <input id="page" type="number" />
           <label for="read">Read:</label>
-          <input id="read" type="text" />
+          <input id="read" type="checkbox" />
           <button value="cancel" formmethod="dialog">Cancel</button>
           <button id="confirmBtn" value="default">Confirm</button>
         </form>
@@ -28,12 +28,12 @@
       // array that will contain the book objects
       const myLibrary = [];
       const list = document.querySelector("ul");
-      const button = document.querySelector("#add-book");
+      const addButton = document.querySelector("#add-book");
       const confirmBtn = document.querySelector("#confirmBtn");
       const dialog = document.querySelector("dialog");
 
       // button that shows dialog form
-      button.addEventListener("click", () => {
+      addButton.addEventListener("click", () => {
         dialog.showModal();
       });
 
@@ -45,23 +45,26 @@
         this.readStatus = readStatus;
         this.info = function () {
           const { title, author, pages, readStatus } = this;
-          return `${title} by ${author}, ${pages} pages, ${readStatus} yet!`;
+          return `${this.title} by ${this.author}, ${this.pages} pages, ${
+            this.readStatus ? "has been read" : "has not been read yet"
+          }`;
         };
       }
 
       styles();
 
       // function that asks for book name
-      confirmBtn.addEventListener("click", () => {
+      confirmBtn.addEventListener("click", (e) => {
         // inputs inside the dialog
         let title = document.getElementById("title").value;
         let author = document.getElementById("author").value;
         let page = document.getElementById("page").value;
-        let read = document.getElementById("read").value;
+        let read = document.getElementById("read").checked;
 
         // if any of the inputs are empty, give warning
-        if (!title || !author || !page || !read) {
+        if (!title || !author || !page) {
           alert("Please fill in all fields");
+          e.preventDefault(); // prevent the form from submitting
           return;
         }
 
@@ -81,12 +84,40 @@
         list.innerHTML = ""; // Clear the list
         myLibrary.forEach((book) => {
           const bookListItem = document.createElement("li");
-          bookListItem.textContent = book.info();
+
+          // Create a span element to hold the book information
+          const bookInfoSpan = document.createElement("span");
+          bookInfoSpan.textContent = book.info();
+
+          // Add the span element to the li element
+          bookListItem.appendChild(bookInfoSpan);
+
+          // add update read status button to each li
+          const isRead = document.createElement("button");
+          isRead.textContent = "read";
+          isRead.classList.add("read-button");
+          bookListItem.appendChild(isRead);
+
+          // add delete button to each li
           const deleteBtn = document.createElement("button");
           deleteBtn.textContent = "x";
           deleteBtn.classList.add("delete-button");
           bookListItem.appendChild(deleteBtn);
+
           list.appendChild(bookListItem);
+
+          // Add event listener to the read button
+          isRead.addEventListener("click", () => {
+            if (isRead.textContent === "read") {
+              isRead.textContent = "not read";
+              book.readStatus = false;
+              bookInfoSpan.textContent = book.info();
+            } else if (isRead.textContent === "not read") {
+              isRead.textContent = "read";
+              book.readStatus = true;
+              bookInfoSpan.textContent = book.info();
+            }
+          });
 
           // Add event listener to the delete button
           deleteBtn.addEventListener("click", () => {
@@ -108,18 +139,24 @@
         title.value = "";
         author.value = "";
         page.value = "";
-        read.value = "";
+        read.checked = false;
       }
 
       // function to add styles
       function styles() {
         document.body.style.fontFamily = "Arial, sans-serif";
         document.querySelectorAll("button").forEach((e) => {
-          e.style.margin = "0 10px";
+          e.style.margin = "0 5px";
+          e.style.backgroundColor = "#AFAF9A";
+          e.style.width = "80px";
+          e.style.height = "40px";
+          e.style.borderRadius = "5px";
         });
         document.querySelectorAll("input").forEach((e) => {
           e.style.display = "block";
           e.style.margin = "10px 0";
+          e.style.backgroundColor = "#EEE";
+          e.style.borderRadius = "5px";
         });
       }
     </script>
